@@ -37,9 +37,10 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
       const newCart = [...cart];
       const productExists = newCart.find((product) => product.id === productId);
 
-      const stock = await api.get(`/stock/${productId}`);
+      const response = await api.get(`/stock/${productId}`);
+      const stock: Stock = response.data;
 
-      const stockAmount = stock.data.amount;
+      const stockAmount = stock.amount;
       const currentAmount = productExists ? productExists.amount : 0;
       const amount = currentAmount + 1;
 
@@ -51,9 +52,10 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
       if (productExists) {
         productExists.amount = amount;
       } else {
-        const product = await api.get(`/products/${productId}`);
+        const response = await api.get(`/products/${productId}`);
+        const product: Product = response.data
 
-        const newProduct = { ...product.data, amount: 1 };
+        const newProduct = { ...product, amount: 1 };
         newCart.push(newProduct);
       }
 
@@ -76,7 +78,7 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
         setCart(newCart);
         localStorage.setItem("@RocketShoes:cart", JSON.stringify(newCart));
       } else {
-        throw new Error;
+        throw new Error();
       }
     } catch {
       toast.error("Erro na remoção do produto");
@@ -91,15 +93,16 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
       const newCart = [...cart];
       const productIndex = newCart.findIndex(product => product.id === productId);
       
-      const stock = await api.get(`/stock/${productId}`);
+      const response = await api.get(`/stock/${productId}`);
+      const stock: Stock = response.data
 
-      if(amount > stock.data.amount ) {
+      if(amount > stock.amount ) {
         toast.error('Quantidade solicitada fora de estoque');
         return;
       }
 
       if(amount < 1) {
-        throw new Error;
+        throw new Error();
       }
 
       if(productIndex >= 0) {
@@ -107,7 +110,7 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
         setCart(newCart);
         localStorage.setItem('@RocketShoes:cart', JSON.stringify(newCart));
       } else {
-        throw new Error;
+        throw new Error();
       }
 
     } catch {
